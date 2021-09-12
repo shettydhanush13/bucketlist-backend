@@ -50,7 +50,7 @@ module.exports = {
     },
     getAllActivities : async (req, res, next) => {
         try {
-            Activities.find({}, 'title image where activity_id', (err, activities) => err ? next({status : 500, message : err.stack }) : res.send(activities));
+            Activities.find({}, 'title image where activity_id type icon co_ordinates', (err, activities) => err ? next({status : 500, message : err.stack }) : res.send(activities));
         } catch(err) {
             next({status : 500, message : err.stack })
         }
@@ -71,6 +71,8 @@ module.exports = {
             activities.activity_id = activity_id;
             activities.booking_info = req.body.booking_info;
             activities.title = req.body.title;
+            activities.type = req.body.type;
+            activities.icon = req.body.icon;
             activities.where = req.body.where;
             activities.map_link = req.body.map_link;
             activities.co_ordinates = req.body.co_ordinates;

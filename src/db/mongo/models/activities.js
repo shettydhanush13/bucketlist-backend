@@ -5,6 +5,8 @@ const activitiesSchema = new schema(
     {
         is_visible: Boolean,
         activity_id : String,
+        type : Array,
+        icon : String,
         booking_info : {
             organizer : String,
             organizer_id : String
