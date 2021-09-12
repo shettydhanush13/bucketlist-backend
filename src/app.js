@@ -3,10 +3,11 @@ const express = require('express');
 const app = express();
 const routes = require('./routes');
 const { middleware, errorHandler } = require('./core');
-const { postgres } = require("./db")
+const { postgres, mongo } = require("./db")
 
 middleware(app)
-postgres.test();
+postgres.connect();
+mongo.connect();
 
 app.use('/api', routes);
 

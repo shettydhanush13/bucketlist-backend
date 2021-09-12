@@ -12,5 +12,8 @@ module.exports = {
         ssl:  {
             rejectUnauthorized: false,
         }
+    },
+    mongoConfig : {
+        uri : `mongodb+srv://${process.env.mongoUser}:${encodeURIComponent(process.env.mongoPassword)}@cluster0.ejkuv.mongodb.net/${process.env.mongoCluster}?retryWrites=true&w=majority`
     }
 }

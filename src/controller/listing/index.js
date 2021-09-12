@@ -1,54 +1,111 @@
-const { generateQuery } = require("./helper")
 const { updateDB } = require("../../db/postgres")
+const Adventures = require('../../db/mongo/models/adventures');
+const Activities = require('../../db/mongo/models/activities');
+const { nanoid } = require('nanoid');
 
 module.exports = {
-    addListing : async (req, res, next) => {
+    getAllAdventures : async (req, res, next) => {
         try {
-            const { username, product_title, product_description, quantity, price } = req.body
-            await updateDB(generateQuery.createListingTable())
-            await updateDB(generateQuery.addListing(username, product_title, product_description, quantity, price))
-            res.status(200).send({ message : "listing created" })
+            Adventures.find({}, (err, adventures) => err ? next({status : 500, message : err.stack }) : res.send(adventures));
         } catch(err) {
             next({status : 500, message : err.stack })
         }
     },
-    getAllListing : async (req, res, next) => {
+    getAdventureById : async (req, res, next) => {
         try {
-            const response = await updateDB(generateQuery.getAllListing())
-            res.status(200).send({ items : response.rows })
+            const { id } = req.params
+            Adventures.findOne({ adventure_id: id }, (err, adventure) => err ? next({status : 500, message : err.stack }) : res.send(adventure));
         } catch(err) {
             next({status : 500, message : err.stack })
         }
     },
-    getMyListing : async (req, res, next) => {
+    addAdventure : async (req, res, next) => {
         try {
-            const { username } = req.body
-            const response = await updateDB(generateQuery.getMyListing(username))
-            res.status(200).send({ items : response.rows })
+            const adventure_id = nanoid()
+            let adventures = new Adventures();
+            adventures.is_visible = true;
+            adventures.adventure_id = adventure_id;
+            adventures.title = req.body.title;
+            adventures.place = req.body.place;
+            adventures.image = req.body.image;
+            adventures.save((err,response) => err ? next({status : 500, message : err.stack }) : res.json({ id : adventure_id }))
         } catch(err) {
             next({status : 500, message : err.stack })
         }
     },
-    updateListing : async (req, res, next) => {
+    updateAdventure : async (req, res, next) => {
         try {
-            const { username, quantity, price } = req.body
-            const { listingId } = req.params
-            const response = await updateDB(generateQuery.updateListing(listingId, username, quantity, price))
-            if(response.rows.length === 0) return next({status : 401, message : "unable to update this listing" })
-            res.status(200).send({ items : "update successful" })
+            const { id } = req.params
+            Adventures.findOneAndUpdate({ adventure_id: id }, { $set: req.body }, (err, response) => err ? next({status : 500, message : err.stack }) : res.send({ message: `adventure id : ${response.adventure_id } updated succesfully`}));
         } catch(err) {
             next({status : 500, message : err.stack })
         }
     },
-    deleteListing : async (req, res, next) => {
+    deleteAdventureById : async (req, res, next) => {
         try {
-            const { username } = req.body
-            const { listingId } = req.params
-            const response = await updateDB(generateQuery.deleteListing(listingId, username))
-            if(response.rows.length === 0) return next({status : 401, message : "unable to delete this listing" })
-            res.status(200).send({ items : "delete successful" })
+            const { id } = req.params
+            Adventures.findOneAndDelete({ adventure_id: id }, (err, response) => err ? next({status : 500, message : err.stack }) : res.send({ message: `adventure id : ${response.adventure_id } deleted succesfully`}));
         } catch(err) {
             next({status : 500, message : err.stack })
         }
-    }
+    },
+    getAllActivities : async (req, res, next) => {
+        try {
+            Activities.find({}, (err, activities) => err ? next({status : 500, message : err.stack }) : res.send(activities));
+        } catch(err) {
+            next({status : 500, message : err.stack })
+        }
+    },
+    getActivityById : async (req, res, next) => {
+        try {
+            const { id } = req.params
+            Activities.findOne({ activity_id: id }, (err, activitiy) => err ? next({status : 500, message : err.stack }) : res.send(activitiy));
+        } catch(err) {
+            next({status : 500, message : err.stack })
+        }
+    },
+    addActivity : async (req, res, next) => {
+        try {
+            const activity_id = nanoid()
+            let activities = new Activities();
+            activities.is_visible = true;
+            activities.activity_id = activity_id;
+            activities.booking_info = req.body.booking_info;
+            activities.title = req.body.title;
+            activities.where = req.body.where;
+            activities.map_link = req.body.map_link;
+            activities.co_ordinates = req.body.co_ordinates;
+            activities.image = req.body.image;
+            activities.short_description = req.body.phone;
+            activities.what = req.body.what;
+            activities.why = req.body.why;
+            activities.safety = req.body.safety;
+            activities.best_time = req.body.best_time;
+            activities.stay = req.body.stay;
+            activities.food = req.body.food;
+            activities.nearby_attarction = req.body.nearby_attarction;
+            activities.how_to_reach = req.body.how_to_reach;
+            activities.more_info = req.body.more_info;
+            activities.faq = req.body.faq;
+            activities.save((err,response) => err ? next({status : 500, message : err.stack }) : res.json({ id : activity_id }))
+        } catch(err) {
+            next({status : 500, message : err.stack })
+        }
+    },
+    updateActivity : async (req, res, next) => {
+        try {
+            const { id } = req.params
+            Activities.findOneAndUpdate({ activity_id: id }, { $set: req.body }, (err, response) => err ? next({status : 500, message : err.stack }) : res.send({ message: `activity id : ${response.activity_id } updated succesfully`}));
+        } catch(err) {
+            next({status : 500, message : err.stack })
+        }
+    },
+    deleteActivityById : async (req, res, next) => {
+        try {
+            const { id } = req.params
+            Activities.findOneAndDelete({ activity_id: id }, (err, response) => err ? next({status : 500, message : err.stack }) : res.send({ message: `activity id : ${response.activity_id } deleted succesfully`}));
+        } catch(err) {
+            next({status : 500, message : err.stack })
+        }
+    },
 }

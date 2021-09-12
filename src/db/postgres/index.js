@@ -5,7 +5,7 @@ const { poolData } = require("../../config")
 const pool = new Pool(poolData)
 
 module.exports = {
-  test: () => {
+  connect: () => {
     pool.connect().then((client) => {
       return client.query('SELECT NOW() as now', (err, result) => {
         if (err) {

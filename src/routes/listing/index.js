@@ -1,13 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const authenticate = require("../../core/authentication")
 
-const { addListing, getAllListing, getMyListing, updateListing, deleteListing } = require('../../controller/listing');
+const {
+    getAllAdventures,
+    addAdventure,
+    updateAdventure,
+    getAdventureById,
+    deleteAdventureById,
+    getAllActivities,
+    addActivity,
+    updateActivity,
+    getActivityById,
+    deleteActivityById
+} = require('../../controller/listing');
 
-router.post('/', authenticate, addListing);
-router.get('/', getAllListing);
-router.get('/myListing', authenticate, getMyListing);
-router.put('/:listingId', authenticate, updateListing);
-router.delete('/:listingId', authenticate, deleteListing);
+router.get('/adventure', getAllAdventures);
+router.post('/adventure', addAdventure);
+router.put('/adventure/:id', updateAdventure);
+router.get('/adventure/:id', getAdventureById);
+router.delete('/adventure/:id', deleteAdventureById);
+router.get('/activities', getAllActivities);
+router.post('/activities', addActivity);
+router.put('/activities/:id', updateActivity);
+router.get('/activities/:id', getActivityById);
+router.delete('/activities/:id', deleteActivityById);
 
 module.exports = router;
