@@ -1,4 +1,3 @@
-const { updateDB } = require("../../db/postgres")
 const Adventures = require('../../db/mongo/models/adventures');
 const Activities = require('../../db/mongo/models/activities');
 const { nanoid } = require('nanoid');
@@ -51,7 +50,7 @@ module.exports = {
     },
     getAllActivities : async (req, res, next) => {
         try {
-            Activities.find({}, (err, activities) => err ? next({status : 500, message : err.stack }) : res.send(activities));
+            Activities.find({}, 'title image where activity_id', (err, activities) => err ? next({status : 500, message : err.stack }) : res.send(activities));
         } catch(err) {
             next({status : 500, message : err.stack })
         }
