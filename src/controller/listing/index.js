@@ -50,7 +50,7 @@ module.exports = {
     },
     getAllActivities : async (req, res, next) => {
         try {
-            Activities.find({}, 'title image where activity_id type icon co_ordinates', (err, activities) => err ? next({status : 500, message : err.stack }) : res.send(activities));
+            Activities.find({}, 'title image where best_time activity_id type icon co_ordinates', (err, activities) => err ? next({status : 500, message : err.stack }) : res.send(activities));
         } catch(err) {
             next({status : 500, message : err.stack })
         }
