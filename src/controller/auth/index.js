@@ -1,16 +1,36 @@
-const { updateDB } = require("../../db/postgres")
-const { generateQuery, compare, generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("./helper")
+const { compare, generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("./helper")
 const { validateSignupPayload, validateLoginPayload, validateTokenPayload } = require("./validation")
+const Users = require('../../db/mongo/models/userdetails');
+const Tokens = require('../../db/mongo/models/refreshTokens');
+const { encode } = require('../auth/helper');
 
 module.exports = {
-    signup: async (req, res, next) => {
+    signup : async (req, res, next) => {
         try {
+            const generateReferalCode = name => name.substr(0,3).toUpperCase()+Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 4).toUpperCase()
             const validation = validateSignupPayload(req.body)
             if(validation.error) return next({status : 500, message : validation.message })
             const { username, email, password } = req.body
-            await updateDB(generateQuery.createUserTable())
-            await updateDB(await generateQuery.insertUser(username, email, password))
-            res.json({ message: "signup successful" });
+            const users = new Users();
+            users.firstName = req.body.firstName || ''
+            users.lastName = req.body.lastName || ''
+            users.username = username
+            users.password = await encode(password)
+            users.email = email
+            users.bio = req.body.bio || ''
+            users.profileImage = req.body.profileImage || ''
+            users.website = req.body.website || ''
+            users.youtube = req.body.youtube || ''
+            users.instagram = req.body.instagram || ''
+            users.phone = req.body.phone || ''
+            users.country = req.body.country || ''
+            users.city = req.body.city || ''
+            users.interests = req.body.interests || []
+            users.badges = req.body.badges || []
+            users.credits = req.body.credits || 0
+            users.referalCode = generateReferalCode(username)
+            users.activities = req.body.activities || []
+            users.save((err,response) => err ? next({status : 500, message : err.stack }) : res.json({ message: `user : ${username} created succesfully`, response}))
         } catch(err) {
             next({status : 500, message : err.stack })
         }
@@ -20,16 +40,15 @@ module.exports = {
             const validation = validateLoginPayload(req.body)
             if(validation.error) return next({status : 500, message : validation.message })
             const { email, password } = req.body
-            await updateDB(generateQuery.createTokenTable())
-            const response = await updateDB(generateQuery.getUser(email))
-            const user = response.rows[0]
-            if(response.rows.length === 0) return next({status : 404, message : "no account found with this email" })
+            const user = await Users.findOne({ email })
+            if(!user) return next({status : 404, message : "no account found with this email" })
             const validPassword = await compare(password, user.password)
             if(!validPassword) return next({status : 401, message : "incorrect password" })
-            const accessToken = generateAccessToken(user);
-            const refreshToken = generateRefreshToken(user);
-            await updateDB(generateQuery.addToken(refreshToken))
-            res.status(200).json({ accessToken, refreshToken });
+            const accessToken = generateAccessToken({ email, password });
+            const refreshToken = generateRefreshToken({ email, password });
+            const tokens = new Tokens();
+            tokens.token = refreshToken
+            tokens.save((err) => err ? next({status : 500, message : err.stack }) : res.status(200).json({ accessToken, refreshToken }))
         } catch(err) {
             next({status : 500, message : err.stack })
         }
@@ -38,7 +57,8 @@ module.exports = {
         try {
             const validation = validateTokenPayload(req.body)
             if(validation.error) return next({status : 500, message : validation.message })
-            await updateDB(generateQuery.deleteToken(req.body.token))
+            const { token } = req.body;
+            await Tokens.findOneAndDelete({ token })
             res.json({ message: "logout successful" });
         } catch(err) {
             next({status : 500, message : err.stack })
@@ -48,12 +68,12 @@ module.exports = {
         try {
             const validation = validateTokenPayload(req.body)
             if(validation.error) return next({status : 500, message : validation.message })
-            const refreshToken = req.body.token;
-            if(!refreshToken) return next({status : 401, message : "invalid token" })
-            const response = await updateDB(generateQuery.getToken(refreshToken))
-            if(response.rows.length === 0) return next({status : 403, message : "not authenticated" })
+            const { token } = req.body;
+            if(!token) return next({status : 401, message : "invalid token" })
+            const response = await Tokens.findOne({ token })
+            if(!response) return next({status : 403, message : "not authenticated" })
             else{
-                verifyRefreshToken(refreshToken)
+                verifyRefreshToken(token)
                 .then(response => res.status(200).json(response))
                 .catch(err => next({status : 403, message : err.message }))
             }
