@@ -30,7 +30,17 @@ module.exports = {
             users.credits = req.body.credits || 0
             users.referalCode = generateReferalCode(username)
             users.activities = req.body.activities || []
-            users.save((err,response) => err ? next({status : 500, message : err.stack }) : res.json({ message: `user : ${username} created succesfully`, response}))
+            users.save((err) => {
+                if(err) {
+                    let errorMessage = err.toString();
+                    if(err.toString().indexOf("MongoServerError") > -1){
+                        if(err.toString().indexOf("username_1 dup key") > -1) errorMessage = "Account with this username already exists";
+                        if(err.toString().indexOf("email_1 dup key") > -1) errorMessage = "Account with this email already exists";
+                    }
+                    next({status : 500, message : errorMessage })
+                }
+                else res.json({ message: `user : ${username} created succesfully` })
+            })
         } catch(err) {
             next({status : 500, message : err.stack })
         }

@@ -10,8 +10,8 @@ module.exports = {
     },
     getUserByUsername : async (req, res, next) => {
         try {
-            const { username } = req.params
-            Users.findOne({ username }, (err, response) => err ? next({status : 500, message : err.stack }) : res.send(response));
+            const { email } = req.body
+            Users.findOne({ email }, (err, response) => err ? next({status : 500, message : err.stack }) : res.send(response));
         } catch(err) {
             next({status : 500, message : err.stack })
         }

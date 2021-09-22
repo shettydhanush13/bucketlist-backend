@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const authentication = require('../../core/authentication')
 
 const {
     getAllUsers,
@@ -9,7 +10,7 @@ const {
 } = require('../../controller/userManagement');
 
 router.get('/', getAllUsers);
-router.get('/:username', getUserByUsername);
+router.get('/user', authentication, getUserByUsername);
 router.put('/:username', updateUser);
 router.delete('/:username', deleteUser);
 

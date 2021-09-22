@@ -5,9 +5,15 @@ const userdetailsSchema = new schema(
     {
         firstName: String,
         lastName : String,
-        username : String,
+        username : {
+            type: String,
+            unique: true
+        },
         password : String,
-        email : String,
+        email : {
+            type: String,
+            unique: true
+        },
         profileImage: String,
         bio: String,
         website : String,
