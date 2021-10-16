@@ -24,6 +24,7 @@ const activitiesSchema = new schema(
             image : String,
             info : String
         },
+        forumTopics : Array,
         why : [{
             image : String,
             image_source : String,

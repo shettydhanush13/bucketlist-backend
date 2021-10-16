@@ -72,6 +72,7 @@ module.exports = {
             activities.booking_info = req.body.booking_info;
             activities.title = req.body.title;
             activities.type = req.body.type;
+            activities.forumTopics = req.body.forumTopics;
             activities.icon = req.body.icon;
             activities.where = req.body.where;
             activities.map_link = req.body.map_link;
@@ -96,6 +97,7 @@ module.exports = {
     updateActivity : async (req, res, next) => {
         try {
             const { id } = req.params
+            console.log(req.body)
             Activities.findOneAndUpdate({ activity_id: id }, { $set: req.body }, (err, response) => err ? next({status : 500, message : err.stack }) : res.send({ message: `activity id : ${response.activity_id } updated succesfully`}));
         } catch(err) {
             next({status : 500, message : err.stack })

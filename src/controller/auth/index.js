@@ -30,6 +30,8 @@ module.exports = {
             users.credits = req.body.credits || 0
             users.referalCode = generateReferalCode(username)
             users.activities = req.body.activities || []
+            users.bucketList = req.body.bucketList || []
+            users.forums = req.body.forums || []
             users.save((err) => {
                 if(err) {
                     let errorMessage = err.toString();

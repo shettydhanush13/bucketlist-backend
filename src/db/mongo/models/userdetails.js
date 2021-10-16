@@ -25,6 +25,8 @@ const userdetailsSchema = new schema(
         interests: Array,
         badges: Array,
         activities : Array,
+        forums: Array,
+        bucketList: Array,
         credits : Number,
         referalCode : String
     }

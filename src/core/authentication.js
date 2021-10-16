@@ -5,7 +5,6 @@ module.exports = async (req, res, next) => {
     if(!auth) return res.status(401).send({ message  : "Access denied" })
     const token = auth.split(" ")[1]
     const tokenStatus = await verifyAccessToken(token)
-    console.log({tokenStatus, token})
     if(tokenStatus.error){
         res.status(401).send({ status : 401, message  : tokenStatus.message })
     } else {

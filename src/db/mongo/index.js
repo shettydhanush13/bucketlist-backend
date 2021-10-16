@@ -7,7 +7,7 @@ module.exports = {
     mongoose.connect(mongoConfig.uri, err => { if(err) throw err });
     const connection = mongoose.connection;
     connection.once("open", () => {
-        logger.info("MongoDB database connection established successfully");
+        logger.info(`MongoDB database connection established successfully : ${mongoConfig.uri}`);
     });
   }
 };
